@@ -1,32 +1,30 @@
+# app.py
 import streamlit as st
-import pydub
+from pydub import AudioSegment
 
-# Define the function to merge the MP3 files
-def merge_mp3(files):
-    # Create a new empty MP3 file
-    out = pydub.AudioSegment.empty()
+def merge_mp3(files, output_filename):
+    audio = AudioSegment.silent(duration=0)
 
-    # Iterate over the input files
-    for f in files:
-        # Read the input file
-        audio = pydub.AudioSegment.from_file(f)
+    for file in files:
+        audio += AudioSegment.from_mp3(file)
 
-        # Append the audio to the output file
-        out += audio
+    audio.export(output_filename, format="mp3")
 
-    # Write the output file
-    out.export("output.mp3")
+def main():
+    st.title("MP3 Merger App")
 
-# Set the title of the app
-st.title("Merge MP3 Files")
+    st.write("Upload the MP3 files you want to merge:")
+    input_files = st.file_uploader("Choose MP3 Files", type=["mp3"], accept_multiple_files=True)
 
-# Create a file input widget
-files = st.file_uploader("Select the MP3 files to merge", multiple=True)
+    if input_files:
+        st.write("Files to be merged:")
+        for file in input_files:
+            st.write(file.name)
 
-# Check if any files were uploaded
-if files is not None:
-    # Merge the files
-    merge_mp3(files)
+        if st.button("Merge Files"):
+            output_filename = "output.mp3"
+            merge_mp3([file.name for file in input_files], output_filename)
+            st.success(f"Files merged successfully. Output file: {output_filename}")
 
-    # Display a success message
-    st.success("The MP3 files have been merged successfully.")
+if __name__ == "__main__":
+    main()
