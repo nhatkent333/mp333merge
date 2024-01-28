@@ -4,12 +4,9 @@ import pathlib
 import streamlit as st
 from pydub import AudioSegment
 
-st.title('MP3 Merger')
+st.title('Ghép Nối File MP3')
 
-st.markdown("""This is a quick example app for merging multiple MP3 files using the **pydub** audio library on Streamlit Cloud.
-There are some issues with `ffmpeg` on Streamlit Cloud regarding temporary files and file permissions.
-The quick fix is to use `libav` instead of `ffmpeg` in `packages.txt` file, because pydub prefers `libav` over `ffmpeg` if it is installed.
-Therefore this example app uses `libav`.""")
+st.markdown("""Công cụ ghép nối file MP3 do [Việc Làm Vui](https://vieclamvui.com/ "tìm việc làm, tuyển dụng miễn phí") phát triển. Thuộc dự án 1001 công cụ online hỗ trợ cho hơn 100 ngành nghề.""")
 
 uploaded_files = st.file_uploader('Upload up to 5 MP3 Files', type=['mp3'], accept_multiple_files=True)
 
@@ -19,7 +16,7 @@ if uploaded_files:
         audio = AudioSegment.from_file(uploaded_file)
         merged_audio += audio
     merged_audio.export("merged.mp3", format='mp3')
-    st.success('Files merged successfully!')
+    st.success('Ghép nối các file MP3 thành công!')
 
     # Add download button
     with open("merged.mp3", "rb") as f:
