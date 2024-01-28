@@ -1,24 +1,33 @@
 import streamlit as st
-from pydub import AudioSegment
+import librosa
+import soundfile
 
-def merge_mp3_files(mp3_files):
-    combined = AudioSegment.empty()
-    for mp3_file in mp3_files:
-        audio = AudioSegment.from_file(mp3_file, format="mp3")
-        combined += audio
-    return combined
+# Define the function to merge the MP3 files
+def merge_mp3(files):
+    # Create a new empty MP3 file
+    out = soundfile.AudioSegment.empty()
 
-st.title("Ứng dụng ghép các tệp MP3")
-st.write("Sử dụng ứng dụng này để ghép các tệp MP3 lại với nhau.")
+    # Iterate over the input files
+    for f in files:
+        # Read the input file
+        audio = librosa.load(f, sr=44100)
 
-uploaded_files = st.file_uploader("Chọn các tệp MP3 để ghép lại", accept_multiple_files=True, type="mp3")
+        # Append the audio to the output file
+        out += audio
 
-if uploaded_files:
-    st.write("Các tệp MP3 đã chọn:")
-    for uploaded_file in uploaded_files:
-        st.write(uploaded_file.name)
-    if st.button("Ghép các tệp MP3"):
-        mp3_files = [uploaded_file.name for uploaded_file in uploaded_files]
-        merged_audio = merge_mp3_files(mp3_files)
-        st.write("Tệp MP3 đã được ghép lại!")
-        st.audio(merged_audio.export("merged.mp3", format="mp3"), format="audio/mp3")
+    # Write the output file
+    soundfile.write("output.mp3", out, samplerate=44100)
+
+# Set the title of the app
+st.title("Merge MP3 Files")
+
+# Create a file input widget
+files = st.file_uploader("Select the MP3 files to merge", multiple=True)
+
+# Check if any files were uploaded
+if files is not None:
+    # Merge the files
+    merge_mp3(files)
+
+    # Display a success message
+    st.success("The MP3 files have been merged successfully.")
