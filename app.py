@@ -1,36 +1,35 @@
-import io
-import pathlib
+# Thêm dòng này vào đầu file để sử dụng libav thay vì ffmpeg
+import pydub
+pydub.AudioSegment.ffmpeg = "libav"
 
-import streamlit as st
 from pydub import AudioSegment
+import os
 
-filename = None
-filestream = io.BytesIO()
+def merge_mp3(files, output_filename):
+    audio = AudioSegment.silent(duration=0)
 
-st.title('MP3 to WAV Converter test app')
+    for file in files:
+        audio += AudioSegment.from_mp3(file)
 
-st.markdown("""This is a quick example app for using the **pydub** audio library on Streamlit Cloud.
-There are some issues with `ffmpeg` on Streamlit Cloud regarding temporary files and file permissions.
-The quick fix is to use `libav` instead of `ffmpeg` in `packages.txt` file, because pydub prefers `libav` over `ffmpeg` if it is installed.
-Therefore this example app uses `libav`.""")
+    audio.export(output_filename, format="mp3")
 
-uploaded_mp3_file = st.file_uploader('Upload Your MP3 File', type=['mp3'])
+# Hàm để upload file MP3
+def upload_mp3():
+    import streamlit as st
+    uploaded = st.file_uploader("Upload các file MP3 cần nối", type=["mp3"])
+    if uploaded is not None:
+        return [os.path.join("user_uploaded", file.name) for file in uploaded]
+    else:
+        return []
 
-if uploaded_mp3_file:
-    uploaded_mp3_file_length = len(uploaded_mp3_file.getvalue())
-    if uploaded_mp3_file_length > 0:
-        st.text(f'Size of uploaded mp3 file: {uploaded_mp3_file_length} bytes')
-        audio_segment = AudioSegment.from_mp3(uploaded_mp3_file)
-        # do some more processing here with the mp3 file(?)
-        handler = audio_segment.export(filestream, format="wav")  # handler not needed
-        filename = pathlib.Path(uploaded_mp3_file.name).stem
+# Upload các file MP3
+print("Upload các file MP3 cần nối:")
+input_files = upload_mp3()
 
-if filestream and filename:
-    content = filestream.getvalue()
-    length = len(content)
-    if length > 0:
-        st.download_button(label="Download wav file",
-                data=content,
-                file_name=f'{filename}.wav',
-                mime='audio/wav')
-        st.text(f'Size of "{filename}.wav" file to download: {length} bytes')
+# Thay thế 'output.mp3' bằng tên file MP3 đầu ra mong muốn.
+output_filename = 'output.mp3'
+
+# Nối các file MP3
+merge_mp3(input_files, output_filename)
+
+print(f"Files merged successfully. Output file: {output_filename}")
