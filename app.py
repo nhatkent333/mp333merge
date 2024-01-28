@@ -1,14 +1,14 @@
 # app.py
 import streamlit as st
 from pydub import AudioSegment
-from pydub.extras import audio_segment
 import os
 import tempfile
+import shutil  # Thêm thư viện shutil
 
 def merge_mp3(files):
-    audio = audio_segment.from_file(files[0])
+    audio = AudioSegment.from_file(files[0])
     for file in files[1:]:
-        audio += audio_segment.from_file(file)
+        audio += AudioSegment.from_file(file)
     return audio
 
 def main():
@@ -38,6 +38,9 @@ def main():
 
             # Hiển thị link để tải file đã merge
             st.success(f"File đã merge thành công! [Tải về](sandbox:/mnt/data{tmp_output_path})")
+
+            # Xóa thư mục tạm sau khi sử dụng
+            shutil.rmtree(tmp_folder, ignore_errors=True)
 
 if __name__ == "__main__":
     main()
