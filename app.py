@@ -1,50 +1,39 @@
 # app.py
-from flask import Flask, render_template, request, redirect, url_for
-from werkzeug.utils import secure_filename
+import streamlit as st
 from pydub import AudioSegment
 import os
 
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['ALLOWED_EXTENSIONS'] = {'mp3'}
+def merge_mp3(files):
+    # Hàm để merge các file mp3
+    audio = AudioSegment.from_mp3(files[0])
+    for file in files[1:]:
+        audio += AudioSegment.from_mp3(file)
+    return audio
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+def main():
+    st.title("MP3 Merger")
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+    uploaded_files = st.file_uploader("Chọn các file MP3 để merge", type="mp3", accept_multiple_files=True)
 
-@app.route('/merge', methods=['POST'])
-def merge():
-    if 'files[]' not in request.files:
-        return redirect(request.url)
+    if uploaded_files:
+        # Hiển thị danh sách các file đã chọn
+        st.subheader("Các file đã chọn:")
+        for file in uploaded_files:
+            st.write(file.name)
 
-    files = request.files.getlist('files[]')
+        # Kiểm tra nếu người dùng bấm nút "Merge"
+        if st.button("Merge"):
+            # Lấy đường dẫn của các file đã tải lên
+            file_paths = [file.name for file in uploaded_files]
+            file_paths = [os.path.join("uploads", file) for file in file_paths]
 
-    # Check if at least two files are selected
-    if len(files) < 2:
-        return redirect(request.url)
+            # Thực hiện merge và lưu kết quả vào file mới
+            merged_audio = merge_mp3(file_paths)
+            output_path = os.path.join("output", "merged.mp3")
+            merged_audio.export(output_path, format="mp3")
 
-    # Save the uploaded files
-    saved_files = []
-    for file in files:
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            saved_files.append(filename)
+            # Hiển thị link để tải file đã merge
+            st.success(f"File đã merge thành công! [Tải về](sandbox:/mnt/data/{output_path})")
 
-    # Merge the files
-    merged_audio = AudioSegment.silent()
-    for filename in saved_files:
-        audio_segment = AudioSegment.from_mp3(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        merged_audio += audio_segment
-
-    # Save the merged audio
-    merged_filename = 'merged_output.mp3'
-    merged_audio.export(os.path.join(app.config['UPLOAD_FOLDER'], merged_filename), format='mp3')
-
-    return redirect(url_for('index'))
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    main()
