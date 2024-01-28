@@ -1,15 +1,13 @@
-# app.py
 import streamlit as st
-from pydub import AudioSegment
 import os
 import tempfile
-import shutil  # Thêm thư viện shutil
+import ffmpeg
 
 def merge_mp3(files):
-    audio = AudioSegment.from_file(files[0])
-    for file in files[1:]:
-        audio += AudioSegment.from_file(file)
-    return audio
+    input_files = "|".join(files)
+    output_path = os.path.join(tempfile.mkdtemp(), "merged.mp3")
+    ffmpeg.input(f'concat:{input_files}').output(output_path).run()
+    return output_path
 
 def main():
     st.title("MP3 Merger")
