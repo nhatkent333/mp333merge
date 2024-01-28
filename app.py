@@ -2,11 +2,9 @@
 import streamlit as st
 from pydub import AudioSegment
 import os
+import tempfile
 
-# Thiết lập đường dẫn của FFmpeg cho Pydub
-# Trong Streamlit Cloud, FFmpeg thường đã được cài sẵn, không cần phải thiết lập đường dẫn
-# Nếu cần, bạn có thể để Pydub tự tìm đường dẫn bằng cách không thiết lập giá trị này
-# AudioSegment.converter = "/usr/bin/ffmpeg"  # Đường dẫn có thể thay đổi, tùy thuộc vào cài đặt cụ thể trên Streamlit Cloud
+# Không cần thiết lập đường dẫn của FFmpeg và ffprobe, để Pydub tự tìm
 
 def merge_mp3(files):
     audio = AudioSegment.from_mp3(files[0])
@@ -25,9 +23,8 @@ def main():
             st.write(file.name)
 
         if st.button("Merge"):
-            # Lưu các file vào thư mục tạm trên Streamlit Cloud
-            tmp_folder = "/tmp/uploads"
-            os.makedirs(tmp_folder, exist_ok=True)
+            # Tạo thư mục tạm trên Streamlit Cloud
+            tmp_folder = tempfile.mkdtemp()
 
             file_paths = [os.path.join(tmp_folder, file.name) for file in uploaded_files]
 
@@ -37,7 +34,7 @@ def main():
 
             # Thực hiện merge và lưu kết quả vào thư mục tạm
             merged_audio = merge_mp3(file_paths)
-            tmp_output_path = "/tmp/merged.mp3"
+            tmp_output_path = os.path.join(tmp_folder, "merged.mp3")
             merged_audio.export(tmp_output_path, format="mp3")
 
             # Hiển thị link để tải file đã merge
