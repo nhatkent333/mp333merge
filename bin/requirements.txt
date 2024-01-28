@@ -1,0 +1,3 @@
+# bin/requirements.txt
+
+https://github.com/FFmpeg/FFmpeg
