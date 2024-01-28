@@ -1,44 +1,27 @@
-# app.py
-
-from pydub import AudioSegment
-import os
 import streamlit as st
-from io import BytesIO
+from pydub import AudioSegment
 
-# Set the path to the bin directory
-BIN_DIR = os.path.join(os.path.dirname(__file__), "bin")
-os.environ["PATH"] += os.pathsep + BIN_DIR
+def merge_mp3_files(file1, file2):
+    audio1 = AudioSegment.from_file(file1)
+    audio2 = AudioSegment.from_file(file2)
+    combined = audio1 + audio2
+    combined.export("merged.mp3", format='mp3')
 
-def merge_mp3(files):
-    audio = AudioSegment.silent(duration=0)
+st.title('MP3 Merger')
 
-    for file in files:
-        audio += AudioSegment.from_file(file, format="mp3")
+uploaded_file1 = st.file_uploader("Choose a MP3 file", type="mp3")
+if uploaded_file1 is not None:
+    file_details = {"FileName":uploaded_file1.name,"FileType":uploaded_file1.type,"FileSize":uploaded_file1.size}
+    st.write(file_details)
 
-    return audio
+uploaded_file2 = st.file_uploader("Choose another MP3 file", type="mp3")
+if uploaded_file2 is not None:
+    file_details = {"FileName":uploaded_file2.name,"FileType":uploaded_file2.type,"FileSize":uploaded_file2.size}
+    st.write(file_details)
 
-# Create a Streamlit app
-st.title("MP3 Merger App")
-
-# Upload MP3 files
-st.write("Upload the MP3 files you want to merge:")
-uploaded_files = st.file_uploader("Choose MP3 files", type=["mp3"], accept_multiple_files=True)
-
-if uploaded_files:
-    # Process the uploaded files
-    file_names = [file.name for file in uploaded_files]
-    st.write(f"Files to be merged: {file_names}")
-
-    # Merge MP3 files
-    merged_audio = merge_mp3([BytesIO(file.read()) for file in uploaded_files])
-
-    # Export the merged audio
-    st.audio(merged_audio.export(format="mp3").read(), format="audio/mp3", start_time=0)
-
-    # Download button for the merged file
-    st.download_button(label="Download Merged File", data=merged_audio.export(format="mp3").read(),
-                       file_name="output.mp3", key="download_button")
-
-# Display a footer or any additional information
-st.write("This app allows you to merge multiple MP3 files.")
-
+if st.button('Merge MP3 Files'):
+    if uploaded_file1 is not None and uploaded_file2 is not None:
+        merge_mp3_files(uploaded_file1, uploaded_file2)
+        st.success('Files merged successfully!')
+    else:
+        st.error('Please upload two MP3 files.')
