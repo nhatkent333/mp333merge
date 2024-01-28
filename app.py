@@ -4,12 +4,10 @@ from pydub import AudioSegment
 import os
 import tempfile
 
-# Không cần thiết lập đường dẫn của FFmpeg và ffprobe, để Pydub tự tìm
-
 def merge_mp3(files):
-    audio = AudioSegment.from_mp3(files[0])
+    audio = AudioSegment.from_file(files[0])
     for file in files[1:]:
-        audio += AudioSegment.from_mp3(file)
+        audio += AudioSegment.from_file(file)
     return audio
 
 def main():
