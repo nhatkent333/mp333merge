@@ -1,27 +1,22 @@
+import io
+import pathlib
+
 import streamlit as st
 from pydub import AudioSegment
 
-def merge_mp3_files(file1, file2):
-    audio1 = AudioSegment.from_file(file1)
-    audio2 = AudioSegment.from_file(file2)
-    combined = audio1 + audio2
-    combined.export("merged.mp3", format='mp3')
-
 st.title('MP3 Merger')
 
-uploaded_file1 = st.file_uploader("Choose a MP3 file", type="mp3")
-if uploaded_file1 is not None:
-    file_details = {"FileName":uploaded_file1.name,"FileType":uploaded_file1.type,"FileSize":uploaded_file1.size}
-    st.write(file_details)
+st.markdown("""This is a quick example app for merging two MP3 files using the **pydub** audio library on Streamlit Cloud.
+There are some issues with `ffmpeg` on Streamlit Cloud regarding temporary files and file permissions.
+The quick fix is to use `libav` instead of `ffmpeg` in `packages.txt` file, because pydub prefers `libav` over `ffmpeg` if it is installed.
+Therefore this example app uses `libav`.""")
 
-uploaded_file2 = st.file_uploader("Choose another MP3 file", type="mp3")
-if uploaded_file2 is not None:
-    file_details = {"FileName":uploaded_file2.name,"FileType":uploaded_file2.type,"FileSize":uploaded_file2.size}
-    st.write(file_details)
+uploaded_mp3_file1 = st.file_uploader('Upload Your First MP3 File', type=['mp3'])
+uploaded_mp3_file2 = st.file_uploader('Upload Your Second MP3 File', type=['mp3'])
 
-if st.button('Merge MP3 Files'):
-    if uploaded_file1 is not None and uploaded_file2 is not None:
-        merge_mp3_files(uploaded_file1, uploaded_file2)
-        st.success('Files merged successfully!')
-    else:
-        st.error('Please upload two MP3 files.')
+if uploaded_mp3_file1 and uploaded_mp3_file2:
+    audio1 = AudioSegment.from_file(uploaded_mp3_file1)
+    audio2 = AudioSegment.from_file(uploaded_mp3_file2)
+    merged_audio = audio1 + audio2
+    merged_audio.export("merged.mp3", format='mp3')
+    st.success('Files merged successfully!')
