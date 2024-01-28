@@ -16,6 +16,9 @@ def main():
     uploaded_files = st.file_uploader("Chọn các file MP3 để merge", type="mp3", accept_multiple_files=True)
 
     if uploaded_files:
+        # Tạo thư mục 'uploads' nếu chưa tồn tại
+        os.makedirs("uploads", exist_ok=True)
+        
         # Hiển thị danh sách các file đã chọn
         st.subheader("Các file đã chọn:")
         for file in uploaded_files:
