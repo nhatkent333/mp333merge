@@ -20,3 +20,13 @@ if uploaded_mp3_file1 and uploaded_mp3_file2:
     merged_audio = audio1 + audio2
     merged_audio.export("merged.mp3", format='mp3')
     st.success('Files merged successfully!')
+
+    # Add download button
+    with open("merged.mp3", "rb") as f:
+        bytes = f.read()
+    st.download_button(
+        label="Download merged file",
+        data=bytes,
+        file_name="merged.mp3",
+        mime="audio/mpeg",
+    )
