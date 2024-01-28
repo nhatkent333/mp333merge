@@ -1,0 +1,16 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MP3 Merger</title>
+</head>
+<body>
+    <h1>MP3 Merger</h1>
+    <form action="/merge" method="post" enctype="multipart/form-data">
+        <input type="file" name="files[]" multiple accept=".mp3">
+        <input type="submit" value="Merge">
+    </form>
+</body>
+</html>
