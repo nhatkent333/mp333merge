@@ -1,1 +1,1 @@
-web: streamlit run tên_file.py
+web: streamlit run app.py
