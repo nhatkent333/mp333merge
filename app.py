@@ -1,3 +1,11 @@
+import io
+import pathlib
+
+import streamlit as st
+from pydub import AudioSegment
+
+st.title('MP3 Merger')
+
 st.markdown("""This is a quick example app for merging multiple MP3 files using the **pydub** audio library on Streamlit Cloud.
 There are some issues with `ffmpeg` on Streamlit Cloud regarding temporary files and file permissions.
 The quick fix is to use `libav` instead of `ffmpeg` in `packages.txt` file, because pydub prefers `libav` over `ffmpeg` if it is installed.
