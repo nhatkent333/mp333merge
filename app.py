@@ -1,6 +1,7 @@
 # app.py
 import streamlit as st
 from pydub import AudioSegment
+import os
 
 def merge_mp3(files, output_filename):
     audio = AudioSegment.silent(duration=0)
@@ -21,10 +22,23 @@ def main():
         for file in input_files:
             st.write(file.name)
 
+        # Save uploaded files to a temporary directory
+        temp_dir = "temp"
+        os.makedirs(temp_dir, exist_ok=True)
+        temp_files = [os.path.join(temp_dir, file.name) for file in input_files]
+
+        for i, file in enumerate(input_files):
+            with open(temp_files[i], "wb") as f:
+                f.write(file.read())
+
         if st.button("Merge Files"):
             output_filename = "output.mp3"
-            merge_mp3([file.name for file in input_files], output_filename)
+            merge_mp3(temp_files, output_filename)
             st.success(f"Files merged successfully. Output file: {output_filename}")
+
+            # Remove temporary files
+            for temp_file in temp_files:
+                os.remove(temp_file)
 
 if __name__ == "__main__":
     main()
