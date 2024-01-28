@@ -1,42 +1,33 @@
-# app.py
 import streamlit as st
-import os
-import soundfile as sf
 import librosa
-import tempfile
+import soundfile
 
+# Define the function to merge the MP3 files
 def merge_mp3(files):
-    # Tạo thư mục tạm trên Streamlit Cloud
-    tmp_folder = tempfile.mkdtemp()
+    # Create a new empty MP3 file
+    out = soundfile.AudioSegment.empty()
 
-    # Tên file output
-    output_path = os.path.join(tmp_folder, "merged.wav")
+    # Iterate over the input files
+    for f in files:
+        # Read the input file
+        audio = librosa.load(f, sr=44100)
 
-    # Đọc và ghi file âm thanh sử dụng librosa và soundfile
-    audio, _ = librosa.load(files[0], sr=None)
-    for file in files[1:]:
-        audio += librosa.load(file, sr=None)[0]
+        # Append the audio to the output file
+        out += audio
 
-    sf.write(output_path, audio, 44100)
+    # Write the output file
+    soundfile.write("output.mp3", out, samplerate=44100)
 
-    return output_path
+# Set the title of the app
+st.title("Merge MP3 Files")
 
-def main():
-    st.title("MP3 Merger")
+# Create a file input widget
+files = st.file_uploader("Select the MP3 files to merge", multiple=True)
 
-    uploaded_files = st.file_uploader("Chọn các file MP3 để merge", type="mp3", accept_multiple_files=True)
+# Check if any files were uploaded
+if files is not None:
+    # Merge the files
+    merge_mp3(files)
 
-    if uploaded_files:
-        st.subheader("Các file đã chọn:")
-        for file in uploaded_files:
-            st.write(file.name)
-
-        if st.button("Merge"):
-            # Thực hiện merge và lưu kết quả vào thư mục tạm
-            merged_audio_path = merge_mp3([file.name for file in uploaded_files])
-
-            # Hiển thị link để tải file đã merge
-            st.success(f"File đã merge thành công! [Tải về](sandbox:/mnt/data{merged_audio_path})")
-
-if __name__ == "__main__":
-    main()
+    # Display a success message
+    st.success("The MP3 files have been merged successfully.")
