@@ -1,8 +1,13 @@
-# Import necessary libraries
+# app.py
+
 from pydub import AudioSegment
 import os
 import streamlit as st
 from io import BytesIO
+
+# Set the path to the bin directory
+BIN_DIR = os.path.join(os.path.dirname(__file__), "bin")
+os.environ["PATH"] += os.pathsep + BIN_DIR
 
 def merge_mp3(files):
     audio = AudioSegment.silent(duration=0)
