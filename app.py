@@ -1,5 +1,5 @@
+import streamlit as st
 from pydub import AudioSegment
-import os
 
 def merge_mp3(files, output_filename):
     audio = AudioSegment.silent(duration=0)
@@ -9,13 +9,25 @@ def merge_mp3(files, output_filename):
 
     audio.export(output_filename, format="mp3")
 
-# Thay thế 'file1.mp3', 'file2.mp3',... bằng đường dẫn thực sự của các file MP3 bạn muốn nối lại.
-input_files = ['/content/1t.mp3', '/content/2t.mp3', 'file3.mp3']
+st.title("MP3 Merger")
 
-# Thay thế 'output.mp3' bằng tên file MP3 đầu ra mong muốn.
-output_filename = 'output.mp3'
+# Thêm nút để chọn các file MP3
+uploaded_files = st.file_uploader("Choose MP3 files to merge", type=["mp3"], accept_multiple_files=True)
 
-# Nối các file MP3
-merge_mp3(input_files, output_filename)
+if uploaded_files:
+    st.write("Files selected:")
+    for file in uploaded_files:
+        st.write(file.name)
 
-print(f"Files merged successfully. Output file: {output_filename}")
+    # Nếu người dùng nhấn nút "Merge", thực hiện quá trình nối file
+    if st.button("Merge MP3"):
+        # Lấy đường dẫn và tên file đầu ra từ người dùng
+        output_filename = st.text_input("Output file name:", "output.mp3")
+
+        # Chuyển đổi các đối tượng FileUploader thành đường dẫn thực tế
+        input_files = [file.name for file in uploaded_files]
+
+        # Nối các file MP3
+        merge_mp3(input_files, output_filename)
+
+        st.success(f"Files merged successfully. Output file: {output_filename}")
