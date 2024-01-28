@@ -3,8 +3,8 @@ import streamlit as st
 from pydub import AudioSegment
 import os
 
-# Specify the path to the FFmpeg executable
-AudioSegment.ffmpeg = "/usr/bin/ffmpeg"
+# Specify the path to the ffprobe executable
+AudioSegment.ffprobe = "/usr/bin/ffprobe"
 
 def merge_mp3(files, output_filename):
     audio = AudioSegment.silent(duration=0)
