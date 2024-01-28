@@ -1,22 +1,21 @@
 import streamlit as st
-import librosa
-import soundfile
+import pydub
 
 # Define the function to merge the MP3 files
 def merge_mp3(files):
     # Create a new empty MP3 file
-    out = soundfile.AudioSegment.empty()
+    out = pydub.AudioSegment.empty()
 
     # Iterate over the input files
     for f in files:
         # Read the input file
-        audio = librosa.load(f, sr=44100)
+        audio = pydub.AudioSegment.from_file(f)
 
         # Append the audio to the output file
         out += audio
 
     # Write the output file
-    soundfile.write("output.mp3", out, samplerate=44100)
+    out.export("output.mp3")
 
 # Set the title of the app
 st.title("Merge MP3 Files")
